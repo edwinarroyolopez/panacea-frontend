@@ -1,10 +1,10 @@
 // src/components/navigation/AppShell.tsx
 "use client";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import styled from "styled-components";
 import { useUI } from "@/store/ui";
-import { useMemo } from "react";
+import { useEffect, useMemo } from "react";
 
 const Shell = styled.div`
   min-height: 100dvh;
@@ -99,6 +99,7 @@ const Tab = styled(Link)<{ active?: boolean }>`
 `;
 
 export default function AppShell({ children }: { children: React.ReactNode }) {
+  const router = useRouter();
   const pathname = usePathname();
   const { navOpen, toggleNav, closeNav, currentGoalId } = useUI();
 
@@ -113,6 +114,18 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
       base.splice(3, 0, { href: `/plan/${currentGoalId}`, label: "Plan" });
     return base;
   }, [currentGoalId]);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const isPublic =
+      pathname?.startsWith("/auth/login") ||
+      pathname?.startsWith("/auth/register") ||
+      pathname === "/";
+    if (isPublic) return;
+
+    const token = localStorage.getItem("token");
+    if (!token) router.replace("/auth/login");
+  }, [pathname, router]);
 
   return (
     <Shell>

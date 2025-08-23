@@ -102,3 +102,34 @@ export const QUERY_PLAN_BY_GOAL = gql`
     }
   }
 `;
+
+
+export const MUTATION_LOGIN = gql`
+  mutation Login($email: String!, $password: String!) {
+    login(email:$email, password:$password) {
+      accessToken
+      user { id name email }
+    }
+  }
+`;
+
+export const MUTATION_REGISTER = gql`
+  mutation Register($email: String!, $password: String!, $name: String) {
+    register(email:$email, password:$password, name:$name) {
+      accessToken
+      user { id name email }
+    }
+  }
+`;
+
+export const QUERY_ME = gql`
+  query Me { me { id name email } }
+`;
+
+export const MUTATION_UPSERT_MY_PROFILE = gql`
+  mutation UpsertMyProfile($input: UpsertUserInput!) {
+    upsertMyProfile(input: $input) {
+      id email name avatarUrl timeZone locale
+    }
+  }
+`;

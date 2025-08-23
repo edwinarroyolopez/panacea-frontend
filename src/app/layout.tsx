@@ -5,7 +5,7 @@ import { ToastProvider } from "@/components/ui/toast/ToastProvider";
 
 export const metadata = {
   title: "Panacea | Ambient AI",
-  description: "MVP ÜMA Health",
+  description: "MVP Health",
 };
 
 export default function RootLayout({
