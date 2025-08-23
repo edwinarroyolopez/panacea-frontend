@@ -1,0 +1,104 @@
+import { gql } from "@apollo/client";
+
+export const MUTATION_SEND_CHAT = gql`
+  mutation SendChat($text: String!) {
+    sendChat(text: $text) {
+      id
+      text
+      goalId
+      planId
+      createdAt
+    }
+  }
+`;
+
+export const QUERY_CHAT_HISTORY = gql`
+  query ChatHistory($goalId: ID, $limit: Int) {
+    chatHistory(goalId: $goalId, limit: $limit) {
+      id
+      role
+      text
+      goalId
+      planId
+      createdAt
+    }
+  }
+`;
+
+export const QUERY_GOALS = gql`
+  query Goals {
+    goals {
+      id
+      title
+      domain
+      status
+      createdAt
+    }
+  }
+`;
+
+export const MUTATION_UPSERT_GOAL = gql`
+  mutation UpsertGoal($input: CreateGoalInput!) {
+    upsertGoal(input: $input) {
+      id
+      title
+      domain
+      status
+      createdAt
+    }
+  }
+`;
+
+export const MUTATION_GENERATE_PLAN = gql`
+  mutation GeneratePlan($goalId: ID!) {
+    generatePlan(goalId: $goalId) {
+      id
+      goalId
+      summary
+      recommendations
+      weeklySchedule { day action }
+      tasks { id title status dueAt scoreWeight }
+    }
+  }
+`;
+
+export const QUERY_TASKS_BY_GOAL = gql`
+  query TasksByGoal($goalId: ID!) {
+    tasksByGoal(goalId: $goalId) {
+      id title status dueAt scoreWeight
+    }
+  }
+`;
+
+export const MUTATION_COMPLETE_TASK = gql`
+  mutation CompleteTask($taskId: ID!) {
+    completeTask(taskId: $taskId) {
+      id title status updatedAt
+    }
+  }
+`;
+
+export const MUTATION_REPLAN = gql`
+  mutation Replan($goalId: ID!) {
+    replan(goalId: $goalId) {
+      id
+      goalId
+      summary
+      recommendations
+      weeklySchedule { day action }
+      tasks { id title status dueAt scoreWeight }
+    }
+  }
+`;
+
+export const QUERY_PLAN_BY_GOAL = gql`
+  query PlanByGoal($goalId: ID!) {
+    planByGoal(goalId: $goalId) {
+      id
+      goalId
+      summary
+      recommendations
+      weeklySchedule { day action }
+    }
+  }
+`;
