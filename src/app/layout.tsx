@@ -1,16 +1,16 @@
+// src/app/layout.tsx
 import Providers from "./providers";
-import StyledComponentsRegistry from "@/components/StyledComponentsRegistry";
+import AppShell from "@/components/navigation/AppShell";
 
-export const metadata = {
-  title: "Panacea | Ambient AI",
-  description: "MVP ÜMA Health - Chat + Orchestrator",
-};
+export const metadata = { title: "Panacea | Ambient AI", description: "MVP ÜMA Health" };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="es">
       <body>
-        <Providers>{children}</Providers>
+        <Providers>
+          <AppShell>{children}</AppShell>
+        </Providers>
       </body>
     </html>
   );
