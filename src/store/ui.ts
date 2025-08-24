@@ -1,10 +1,16 @@
+// src/store/ui.ts
 "use client";
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 
 type UIState = {
-  currentGoalId?: string;
-  setGoalId: (id?: string) => void;
+  currentGoalId: string | null;
+  // API original (¡la mantenemos!)
+  setGoalId: (id: string | null) => void;
+
+  // Alias opcional (puedes usar cualquiera de los dos en el código)
+  setCurrentGoal: (id: string | null) => void;
+  clearGoal: () => void;
 
   navOpen: boolean;
   openNav: () => void;
@@ -15,8 +21,11 @@ type UIState = {
 export const useUI = create<UIState>()(
   persist(
     (set) => ({
-      currentGoalId: undefined,
+      currentGoalId: null,
+
       setGoalId: (id) => set({ currentGoalId: id }),
+      setCurrentGoal: (id) => set({ currentGoalId: id }),
+      clearGoal: () => set({ currentGoalId: null }),
 
       navOpen: false,
       openNav: () => set({ navOpen: true }),

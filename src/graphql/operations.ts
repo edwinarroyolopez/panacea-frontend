@@ -9,9 +9,11 @@ export const MUTATION_SEND_CHAT = gql`
       goalId
       planId
       createdAt
+      effects { type payload }
     }
   }
 `;
+
 
 
 export const QUERY_CHAT_HISTORY = gql`
@@ -133,5 +135,43 @@ export const MUTATION_UPSERT_MY_PROFILE = gql`
     upsertMyProfile(input: $input) {
       id email name avatarUrl timeZone locale
     }
+  }
+`;
+
+export const QUERY_TASKS_TODAY = gql`
+  query TasksToday {
+    tasksToday {
+      id title status dueAt scoreWeight planId
+    }
+  }
+`;
+
+
+export const QUERY_GOAL = gql`
+  query Goal($id: ID!) {
+    goal(id: $id) {
+      id
+      title
+      domain
+      status
+      createdAt
+    }
+  }
+`;
+
+
+export const MUTATION_ADD_TASKS = gql`
+  mutation AddTasks($input: AddTasksInput!) {
+    addTasks(input: $input) {
+      id title status dueAt scoreWeight planId
+    }
+  }
+`;
+
+
+
+export const MUTATION_DELETE_GOAL = gql`
+  mutation DeleteGoal($goalId: ID!) {
+    deleteGoal(goalId: $goalId)
   }
 `;

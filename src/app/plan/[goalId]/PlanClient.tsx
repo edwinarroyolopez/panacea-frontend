@@ -8,9 +8,12 @@ import Button from "@/components/ui/Button";
 import {
   MUTATION_COMPLETE_TASK,
   QUERY_TASKS_BY_GOAL,
+  QUERY_PLAN_BY_GOAL,
+  QUERY_GOAL, // <- agregar
 } from "@/graphql/operations";
 import { markTaskDoneInCache } from "@/lib/cache";
 import { useToast } from "@/components/ui/toast/ToastProvider";
+import AddTasksForm from "./AddTasksForm";
 
 const Wrap = styled.main`
   max-width: 980px;
@@ -20,21 +23,51 @@ const Wrap = styled.main`
   gap: 16px;
 `;
 
+const Tag = styled.span`
+  margin-left: 8px;
+  padding: 2px 8px;
+  font-size: 12px;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  color: var(--muted);
+`;
+
 export default function PlanClient({ goalId }: { goalId: string }) {
   const { success, error } = useToast();
 
-  const { data, loading } = useQuery(QUERY_TASKS_BY_GOAL, {
+  // a) título del objetivo
+  const { data: goalData } = useQuery(QUERY_GOAL, {
+    variables: { id: goalId },
+    skip: !goalId,
+    fetchPolicy: "cache-first",
+  });
+  const goal = goalData?.goal;
+  const title = goal?.title;
+  const domain = goal?.domain;
+
+  // b) plan para obtener planId
+  const { data: planData } = useQuery(QUERY_PLAN_BY_GOAL, {
+    variables: { goalId },
+    skip: !goalId,
+    fetchPolicy: "cache-first",
+  });
+
+  // c) tareas (fallback para planId)
+  const { data: tasksData, loading } = useQuery(QUERY_TASKS_BY_GOAL, {
     variables: { goalId },
     skip: !goalId,
     fetchPolicy: "cache-and-network",
   });
+
+  const planId: string | undefined =
+    planData?.planByGoal?.id ?? tasksData?.tasksByGoal?.[0]?.planId;
 
   const [complete] = useMutation(MUTATION_COMPLETE_TASK, {
     optimisticResponse: (vars) => ({
       completeTask: {
         __typename: "Task",
         id: (vars as any).taskId,
-        title: "", // no lo usamos aquí, pero cumple el selection set
+        title: "",
         status: "DONE",
         updatedAt: new Date().toISOString(),
       },
@@ -58,22 +91,43 @@ export default function PlanClient({ goalId }: { goalId: string }) {
 
   const onComplete = async (taskId: string) => {
     await complete({ variables: { taskId } });
-    // no hace falta refetch: optimistic + update ya actualizan la UI
   };
+
+  const tasks = tasksData?.tasksByGoal ?? [];
+
+  // (Opcional) poner el título en la pestaña
+  if (typeof document !== "undefined") {
+    document.title = title ? `Plan — ${title}` : "Plan";
+  }
 
   return (
     <Wrap>
-      <h1>Plan</h1>
+      <h1>
+        {title ?? "Plan"}
+        {domain ? <Tag>{domain.toUpperCase()}</Tag> : null}
+      </h1>
 
       <Card>
-        <div style={{ marginBottom: 8 }}>
+        <div style={{ marginBottom: 8, display: "flex", gap: 8 }}>
+          <Link href="/goals">← Volver a objetivos</Link>
           <Link href="/chat">Ir al Chat</Link>
         </div>
+
+        {planId ? (
+          <div style={{ marginBottom: 16 }}>
+            <AddTasksForm planId={planId} goalId={goalId} />
+          </div>
+        ) : (
+          <p style={{ marginBottom: 16 }}>
+            Aún no hay plan para este objetivo. Genera uno desde el Chat o el
+            Dashboard.
+          </p>
+        )}
 
         {loading && <p>Cargando tareas…</p>}
 
         <div style={{ display: "grid", gap: 10 }}>
-          {data?.tasksByGoal?.map((t: any) => (
+          {tasks.map((t: any) => (
             <div
               key={t.id}
               style={{
@@ -98,16 +152,15 @@ export default function PlanClient({ goalId }: { goalId: string }) {
               </Button>
             </div>
           ))}
-          {!loading &&
-            (!data?.tasksByGoal || data.tasksByGoal.length === 0) && (
-              <p>
-                No hay tareas aún. Genera o ajusta el plan desde el Chat o el
-                Dashboard.
-              </p>
-            )}
+
+          {!loading && tasks.length === 0 && (
+            <p>
+              No hay tareas aún. Genera o ajusta el plan desde el Chat o el
+              Dashboard.
+            </p>
+          )}
         </div>
       </Card>
-
     </Wrap>
   );
 }
