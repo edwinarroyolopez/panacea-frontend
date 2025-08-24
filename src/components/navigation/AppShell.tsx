@@ -106,9 +106,9 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
   const links = useMemo(() => {
     const base = [
       { href: "/", label: "Inicio" },
+      { href: "/goals", label: "Goals" },
       { href: "/dashboard", label: "Tablero" },
       { href: "/chat", label: "Chat" },
-      { href: "/goals", label: "Goals" },
     ];
     if (currentGoalId)
       base.splice(3, 0, { href: `/plan/${currentGoalId}`, label: "Plan" });

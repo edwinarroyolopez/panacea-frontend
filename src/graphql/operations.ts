@@ -1,9 +1,10 @@
 import { gql } from "@apollo/client";
 
 export const MUTATION_SEND_CHAT = gql`
-  mutation SendChat($text: String!) {
-    sendChat(text: $text) {
+  mutation SendChat($text: String!, $goalId: ID) {
+    sendChat(text: $text, goalId: $goalId) {
       id
+      role
       text
       goalId
       planId
@@ -11,6 +12,7 @@ export const MUTATION_SEND_CHAT = gql`
     }
   }
 `;
+
 
 export const QUERY_CHAT_HISTORY = gql`
   query ChatHistory($goalId: ID, $limit: Int) {

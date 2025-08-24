@@ -27,6 +27,7 @@ export const makeApolloClient = () =>
         Goal: { keyFields: ["id"] },
         Plan: { keyFields: ["id"] },
         UserInfo: { keyFields: ["id"] },
+        ChatMessage: { keyFields: ["id"] },
       },
     }),
   });
